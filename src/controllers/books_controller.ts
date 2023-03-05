@@ -20,12 +20,16 @@ export const getBook = async (req: Request, res: Response) => {
 export const saveBook = async (req: Request, res: Response) => {
 	const bookToBeSaved = req.body;
 	try {
-		const bookCheck = await bookService.getBook(Number(bookToBeSaved.bookId));
-		if (bookCheck) {
-			res.status(406).json("Book Id already exists");
+		if (bookToBeSaved.bookId !== undefined) {
+			const bookCheck = await bookService.getBook(Number(bookToBeSaved.bookId));
+			if (bookCheck) {
+				res.status(406).json("Book Id already exists");
+			} else {
+				const book = await bookService.saveBook(bookToBeSaved);
+				res.status(201).json(book);
+			}
 		} else {
-			const book = await bookService.saveBook(bookToBeSaved);
-			res.status(201).json(book);
+			throw new Error("BookId cannot be null");
 		}
 	} catch (error) {
 		res.status(400).json({ message: (error as Error).message });
@@ -45,8 +49,8 @@ export const updateBook = async (req: Request, res: Response) => {
 export const deleteBook = async (req: Request, res: Response) => {
 	try {
 		const bookId = Number.parseInt(req.params.bookId);
-		const book = await bookService.deleteBook(bookId);
-		res.status(204).json(book);
+		await bookService.deleteBook(bookId);
+		res.status(204).json("Book successfully deleted");
 	} catch (error) {
 		res.status(400).json({ message: (error as Error).message });
 	}

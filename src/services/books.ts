@@ -22,3 +22,12 @@ export const updateBook = async (bookId: number, book: Book) => {
 		},
 	});
 };
+
+// Delete Book By Id
+export const deleteBook = async (bookId: number) => {
+	return Book.destroy({
+		where: {
+			bookId,
+		}
+	});
+};
